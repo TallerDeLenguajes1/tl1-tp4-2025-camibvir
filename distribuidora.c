@@ -15,7 +15,7 @@ typedef struct Nodo{
 Nodo * crearListaVacia();
 Nodo * crearNodo(Tarea nuevaTarea);
 void pedirTarea(Nodo **listatareasPendientes);
-void insertarNodo(Nodo **listTareasPendientes, Tarea nuevaTarea);
+void insertarNodoAlFinal(Nodo **listTareasPendientes, Tarea nuevaTarea);
 void liberarLista(Nodo *lista);
 
 
@@ -54,10 +54,8 @@ void pedirTarea(Nodo **lista) {
         printf("Ingrese la descripcion de la tarea pendiente: \n");
         getchar();//Limpia linea residual del input anterior
         gets(buffer); 
-        
         nuevaTarea.Descripcion = (char *)malloc(strlen(buffer) + 1);
-        strcpy(nuevaTarea.Descripcion, buffer);
-        
+        strcpy(nuevaTarea.Descripcion, buffer);        
         printf("Ingrese la duración de la tarea pendiente (10-100): \n");
         scanf("%d", &nuevaTarea.Duracion);
         
@@ -68,15 +66,14 @@ void pedirTarea(Nodo **lista) {
         
         nuevaTarea.TareaID = i++;
         
-        insertarNodo(lista, nuevaTarea);
-        
-        printf("¿Desea agregar otra tarea? (1: Sí, 0: No): ");
+        insertarNodo(lista, nuevaTarea);        
+        printf("Si quiere agregar otra tarea (1: Sí, 0: No): ");
         scanf("%d", &respuesta);
         
     } while (respuesta != 0);
 }
 
-void insertarNodo (Nodo **lista, Tarea nuevaTarea)
+void insertarNodoAlFinal (Nodo **lista, Tarea nuevaTarea)
 {
     Nodo *nuevoNodo = crearNodo(nuevaTarea);
     
@@ -84,7 +81,7 @@ void insertarNodo (Nodo **lista, Tarea nuevaTarea)
         *lista = nuevoNodo;
     } else {
         Nodo *actual = *lista;
-        while (actual->Siguiente != NULL) {
+        while (actual->Siguiente) {
             actual = actual->Siguiente;
         }
         actual->Siguiente = nuevoNodo;
