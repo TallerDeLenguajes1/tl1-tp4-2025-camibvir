@@ -20,8 +20,8 @@ int buscarNodo (Nodo **start, int id, Nodo **startListaNueva);
 void eliminarNodo (Nodo **start, int id);
 void mostrarLista(Nodo **start);
 void liberarLista(Nodo *lista);
-int buscarPorId(Nodo **start, Nodo **startListaNueva, int idBuscar);
-int buscarPorPalabra(Nodo **start, Nodo **startListaNueva, char palabra[100]);
+void buscarPorId(Nodo **start, Nodo **startListaNueva, int idBuscar);
+void buscarPorPalabra(Nodo **start, Nodo **startListaNueva, char *palabra[100]);
 
 
 
@@ -31,12 +31,16 @@ int main (){
     Nodo *startTareasRealiz = crearListaVacia();
     int opcion;
     pedirTarea(&startTareasPend);
-    printf("\n¿Qué operación desea realizar?\n");
-    printf("1- Ingresar nueva tarea pendiente\n");
-    printf("2- Mover tarea pendiente a realizadas\n");
-    printf("3- Mostrar listas\n");
-    scanf("%d", &opcion);
+    
     do{
+        printf("\n¿Qué operación desea realizar?\n");
+        printf("1- Ingresar nueva tarea pendiente\n");
+        printf("2- Mover tarea pendiente a realizadas\n");
+        printf("3- Mostrar listas\n");
+        printf("4- Buscar tarea por ID\n");
+        printf("5- Buscar tarea por descripción/palabra clave\n");
+        printf("0- Salir del menú\n");
+        scanf("%d", &opcion);
         switch (opcion)
         {
     case 1:
@@ -63,15 +67,24 @@ int main (){
         printf("\n");
         mostrarLista(&startTareasRealiz);
         break;
+    case 4:
+        int idBusc;
+        printf("Ingrese el id de la tarea que desea buscar: ");
+        scanf("%d", &idBusc);
+        buscarPorId(&startTareasPend, &startTareasRealiz, idBusc);
+        break;
+    case 5:
+        char palabraClave[100];
+        printf("Ingrese la palabra clave para buscar en la descrripcion de la tarea:");
+        gets(palabraClave);
+        getchar();
+        buscarPorPalabra(&startTareasPend, &startTareasRealiz, *palabraClave);
+        break;
     
     default:
         break;
         }
-    }while(opcion == 0);
-    
-    // Nodo *listaTareasRealizadas = crearNodo();
-    
-    
+    }while(opcion != 0);
     liberarLista(startTareasRealiz);
     liberarLista(startTareasPend);
     return 0;
@@ -152,17 +165,22 @@ int buscarNodo(Nodo **start, int id, Nodo **startListaNueva){
     Nodo * Aux = *start;
     while(Aux && Aux->T.TareaID != id)
     {
-    Aux = Aux -> Siguiente;
+        Aux = Aux->Siguiente;
     }
     if(Aux){
-        Tarea tareaTrans = Aux->T;
+        // Crear una nueva tarea, copiando bien
+        Tarea tareaTrans;
+        tareaTrans.TareaID = Aux->T.TareaID;
+        tareaTrans.Duracion = Aux->T.Duracion;
+        tareaTrans.Descripcion = (char *)malloc(strlen(Aux->T.Descripcion) + 1);
+        strcpy(tareaTrans.Descripcion, Aux->T.Descripcion);
+
         insertarNodoAlFinal(startListaNueva, tareaTrans);
         return 1;
-    }else{
-        printf("Id no encontrado");
+    } else {
+        printf("Id no encontrado\n");
         return 0;
     }
-    
 }
 
 void eliminarNodo (Nodo **start, int id){
@@ -180,10 +198,11 @@ void eliminarNodo (Nodo **start, int id){
         nodoAnt->Siguiente = nodoAux->Siguiente;
         }
         nodoAux->Siguiente = NULL;
+        }
         free(nodoAux->T.Descripcion);
         free(nodoAux);
         }
-    }
+    
 
     void mostrarLista(Nodo **start){
         Nodo *nodoAux = (*start);
@@ -194,3 +213,34 @@ void eliminarNodo (Nodo **start, int id){
             nodoAux = nodoAux->Siguiente;
         }
     }
+
+    void buscarPorId(Nodo **start, Nodo **startListaNueva, int idBuscar){
+        Nodo *nodoAux = (*start);
+        Nodo *nodoAuxNuevo = (*startListaNueva);
+        
+        while (nodoAux != NULL && nodoAux->T.TareaID != idBuscar){
+            nodoAux = nodoAux->Siguiente;
+        }
+        if(nodoAux != NULL){
+            printf("Tarea pendiente encontrada:\n");
+            printf("Id: %d\n", nodoAux->T.TareaID);
+            printf("Descripcion: %s\n", nodoAux->T.Descripcion);
+            printf("Duracion: %d\n\n", nodoAux->T.Duracion);
+        } else {
+            while (nodoAuxNuevo != NULL && nodoAuxNuevo->T.TareaID != idBuscar){
+                nodoAuxNuevo = nodoAuxNuevo->Siguiente;
+            }
+            if(nodoAuxNuevo != NULL){
+                printf("Tarea realizada encontrada:\n");
+                printf("Id: %d\n", nodoAuxNuevo->T.TareaID);
+                printf("Descripcion: %s\n", nodoAuxNuevo->T.Descripcion);
+                printf("Duracion: %d\n\n", nodoAuxNuevo->T.Duracion);
+            } else {
+                printf("No existe una tarea con ese ID.\n");
+            }
+        }
+    }
+
+void buscarPorPalabra(Nodo **start, Nodo **startListaNueva, char *palabra[100]){
+    
+}
